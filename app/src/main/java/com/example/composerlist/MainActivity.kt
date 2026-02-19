@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost() {
+    val mainViewModel: MainViewModel = viewModel()
     val navController = rememberNavController()
 
     Scaffold(
@@ -74,6 +76,7 @@ fun AppNavHost() {
         ) {
             composable("home") {
                 HomeScreen(
+                    screens = mainViewModel.screenConfigs.value,
                     onScreenClick = { id ->
                         navController.navigate("detail/$id")
                     }
@@ -86,7 +89,7 @@ fun AppNavHost() {
                 )
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getInt("screenId") ?: 1
-                val config = getScreenConfigById(id)
+                val config = mainViewModel.getScreenConfigById(id)
                 if (config != null) {
                     DetailScreen(
                         title = config.title,
@@ -112,6 +115,7 @@ fun AppPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    screens: List<ScreenConfig>,
     onScreenClick: (Int) -> Unit
 ) {
         Scaffold(
